@@ -32,9 +32,9 @@ const App: React.FC = () => {
     return standards.filter(s => selectedGrade === 'All' || s.Grade === selectedGrade);
   }, [standards, selectedGrade]);
 
-  const searchMatches = useMemo(() => {
+  const filteredStandards = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
-    if (q.length < 1) return [];
+    if (q.length < 1) return gradeStandards;
     return gradeStandards.filter(s => s.Code.toLowerCase().includes(q));
   }, [searchQuery, gradeStandards]);
 
@@ -124,18 +124,22 @@ const App: React.FC = () => {
 
       {/* Layout Content */}
       <main className="flex-1 flex overflow-hidden relative">
-        {/* Left Side: Search Matches Sidebar */}
-        <aside className={`w-72 bg-white border-r border-slate-200 flex flex-col transition-all duration-300 ${searchQuery.length > 0 ? 'ml-0' : '-ml-72'}`}>
+        {/* Left Side: Standards Browser Sidebar */}
+        <aside className="w-80 bg-white border-r border-slate-200 flex flex-col z-30 shadow-sm">
           <div className="p-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
-            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{searchMatches.length} Matches</span>
-            <button onClick={() => setSearchQuery('')} className="text-slate-400 hover:text-slate-900 font-bold text-xs underline">Clear</button>
+            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+              {searchQuery ? `${filteredStandards.length} Matches` : `${filteredStandards.length} Standards`}
+            </span>
+            {searchQuery && (
+              <button onClick={() => setSearchQuery('')} className="text-slate-400 hover:text-slate-900 font-bold text-xs underline transition-colors">Clear Filter</button>
+            )}
           </div>
           <div className="flex-1 overflow-y-auto custom-scrollbar">
-            {searchMatches.map(match => (
+            {filteredStandards.map(match => (
               <button
                 key={match.Code}
                 onClick={() => handleSelectStandard(match)}
-                className={`w-full text-left px-5 py-4 border-b border-slate-50 last:border-none transition-all hover:bg-slate-50 group ${selectedStandard?.Code === match.Code ? 'bg-blue-50' : ''}`}
+                className={`w-full text-left px-5 py-4 border-b border-slate-50 last:border-none transition-all hover:bg-slate-50 group ${selectedStandard?.Code === match.Code ? 'bg-blue-50 border-l-4 border-l-blue-600' : 'border-l-4 border-l-transparent'}`}
               >
                 <div className="flex justify-between items-center mb-1">
                   <span className={`font-black text-sm tracking-tight ${selectedStandard?.Code === match.Code ? 'text-blue-600' : 'text-slate-900'}`}>{match.Code}</span>
@@ -144,6 +148,11 @@ const App: React.FC = () => {
                 <div className="text-[10px] text-slate-500 font-medium line-clamp-2 leading-snug">{match.Description}</div>
               </button>
             ))}
+            {filteredStandards.length === 0 && (
+              <div className="p-8 text-center">
+                <p className="text-slate-400 text-sm font-medium">No standards match your search.</p>
+              </div>
+            )}
           </div>
         </aside>
 
@@ -159,7 +168,7 @@ const App: React.FC = () => {
 
         {/* Right Side: Standard Details Sidebar */}
         <aside 
-          className={`fixed right-0 top-[88px] bottom-0 w-[400px] z-30 transform transition-transform duration-500 ease-in-out border-l border-slate-200 ${
+          className={`fixed right-0 top-[88px] bottom-0 w-[400px] z-30 transform transition-transform duration-500 ease-in-out border-l border-slate-200 bg-white ${
             selectedStandard ? 'translate-x-0' : 'translate-x-full'
           }`}
         >
@@ -174,9 +183,9 @@ const App: React.FC = () => {
       </main>
 
       {/* Footer / Legend */}
-      <footer className="bg-slate-900 text-slate-400 px-6 py-2 text-[10px] uppercase font-bold tracking-widest flex flex-wrap justify-between items-center z-50">
+      <footer className="bg-slate-900 text-slate-400 px-6 py-2 text-[10px] uppercase font-bold tracking-widest flex flex-wrap justify-between items-center z-50 shadow-inner">
         <div className="flex items-center gap-4">
-          <span>{gradeStandards.length} Standards Loaded</span>
+          <span>{gradeStandards.length} Standards In Grade</span>
           {searchQuery && <span className="text-amber-400 flex items-center gap-1.5"><div className="w-1.5 h-1.5 bg-amber-400 rounded-full animate-pulse"></div> Filter active</span>}
         </div>
         <div className="flex items-center gap-6">
