@@ -1,0 +1,5 @@
+{
+  "name": "Math Standards Coherence Explorer",
+  "description": "An interactive visualization for exploring math standards and their dependencies using a directed graph coherence map. Features KaTeX math rendering, standard-to-cluster linking, and Gemini-powered pedagogical insights.",
+  "requestFramePermissions": []
+}
